@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
+#include <unistd.h>
 
 
 #define WIDTH 720
@@ -8,6 +10,7 @@
 #define YPL_SIZE WIDTH * HEIGHT
 #define UVPL_SIZE WIDTH * HEIGHT 
 #define RGBPL_SIZE WIDTH * HEIGHT * 3 //3 bytes per pixel 
+#define WIDTH_MINUS_1 720-1
 
 typedef unsigned char uchar_t;
 
@@ -45,8 +48,25 @@ int main(int argc, char** argv)
 
    fread(uv_plane, UVPL_SIZE, 1, fd);;
    fclose(fd);
+
+   //this for the time padding
+   struct timespec tim, tim2;
+   tim.tv_sec = 0;
+   tim.tv_nsec = 710000000L;
    
-   convert_cpu(y_plane, uv_plane, rgb_plane);
+   struct timespec tstart={0,0}, tend={0,0};
+   clock_gettime(CLOCK_MONOTONIC, &tstart);
+   //simulate conversion 60 sec of 24 frames
+   for(int i = 0; i < 60; i++)
+   {
+      for(int j = 0; j < 24; j++) 
+      {
+         convert_cpu(y_plane, uv_plane, rgb_plane);
+      }	   
+
+      nanosleep(&tim , &tim2);
+   } 	   
+   clock_gettime(CLOCK_MONOTONIC, &tend);
 
 #ifdef DEBUG
    printf("Done converting.\n");
@@ -66,6 +86,10 @@ int main(int argc, char** argv)
 #ifdef DEBUG
    printf("Done writing to file.\n");
 #endif
+
+   printf("Conversion complete and took about %.5f seconds\n",
+           ((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) -
+           ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 
    return 0;
 }

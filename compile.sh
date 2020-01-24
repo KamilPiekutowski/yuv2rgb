@@ -1,1 +1,1 @@
-gcc -O yuv2rgb.c -o yuv2rgb
+gcc -Ofast yuv2rgb.c -o yuv2rgb
