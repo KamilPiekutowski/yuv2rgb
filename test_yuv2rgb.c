@@ -2,6 +2,8 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <time.h>
 	  
 const unsigned int  NUM_THREADS  = 16;
 const unsigned int  BUFSIZE = 710 * 420 * 4 / NUM_THREADS;
@@ -18,7 +20,7 @@ int main()
 		pthread_t thr[NUM_THREADS];
     int rc;
 
-		for(int k=0; k < 60 * 20; k++)
+		for(int k=0; k < 3; k++)
 		{
 		    for(int j=0; j < 60; j++)
 		    {
@@ -57,12 +59,16 @@ void* yuv2rgb(unsigned char y, unsigned char u, unsigned char v,
 
 void* test(void* a)
 {
+   struct timespec tim, tim2;
+   tim.tv_sec = 0;
+   tim.tv_nsec = 400000000;
 	  unsigned char b = 10* *(unsigned char*) a;
     //printf("running thread\n");
 		for(int i = 0; i < BUFSIZE; i++)
 	  {
 				 yuv2rgb(1,1,1,&b,&b,&b);
 		}
+		nanosleep(&tim, &tim2);
 
 		pthread_exit(NULL);
 }
