@@ -121,22 +121,6 @@ void yuv2rgb(uint8_t y, uint8_t u, uint8_t v,
 void convert_cpu(uchar_t* y_plane,uchar_t* uv_plane, 
             uchar_t* rgb_plane)
 {
-   uchar_t v_plane[UVPL_SIZE/4];
-   uchar_t u_plane[UVPL_SIZE/4];
-
-   for(int i =0; i < UVPL_SIZE/2; i += 2 )
-   {
-      u_plane[i/2] = uv_plane[i];
-#ifdef DEBUG
-      //printf("UVPL_SIZE / 2 = %d, i/2 %d\n", UVPL_SIZE/2, i/2);
-#endif
-   }
-
-   for(int i =0; i < UVPL_SIZE/2; i += 2 )
-   {
-      v_plane[i/2] = uv_plane[i+1];
-   }
-
    for(int i =0; i < UVPL_SIZE; i++)
    {
       uint8_t y;
@@ -156,8 +140,8 @@ void convert_cpu(uchar_t* y_plane,uchar_t* uv_plane,
 
       y = y_plane[i];
       
-      u = u_plane[idx];
-      v = v_plane[idx];
+      u = uv_plane[idx + idx];
+      v = uv_plane[idx + idx +1];
     
       yuv2rgb(y, u, v, &r, &g, &b);
 
